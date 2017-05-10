@@ -1,0 +1,99 @@
+﻿@model DAL.Product
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Details</title>
+</head>
+<body>
+    <div>
+        <h4>Product Details</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Quantity)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Image)
+            </dt>
+
+            <dd>
+                @if (Model.ShowInList == true && Model.Image != null && Model.Image.Count() > 0)
+                {
+                    var base64 = Convert.ToBase64String(Model.Image);
+                    var imgSrc = String.Format("data:image/gif;base64,{0}", base64);
+                    <img src="@imgSrc" style="width: 300px; height: 300px;" />
+                }
+                else
+                {
+                    <p>The product has no image</p>
+                }
+            </dd>
+
+            @if (Model.ShowInList == true && Model.Image != null && Model.Image.Count() > 0)
+            {
+                <dt>
+                    Show image In List
+                </dt>
+                <dd>
+                    <div class="checkbox">
+                        @Html.RadioButtonFor(model => model.ShowInList, "true", new { disabled = "disabled" }) Yes
+                        @Html.RadioButtonFor(model => model.ShowInList, "false", new { disabled = "disabled" }) No
+                    </div>
+                </dd>
+            }
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Tags)
+            </dt>
+            <dd>
+                @{foreach (var tag in Model.Tags)
+                    {
+                        <input type="checkbox" disabled="disabled" checked="checked" />
+                        var intColor = @tag.Color;
+                        <font color="@String.Format("#{0:X6}", (0xFFFFFF & intColor ))">
+                            @Html.DisplayFor(modelItem => tag.Name)
+                        </font>
+                    }}
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Category)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Category.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Price)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Price)
+            </dd>
+
+        </dl>
+    </div>
+    <p>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+
+</body>
+</html>

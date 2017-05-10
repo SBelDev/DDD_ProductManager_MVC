@@ -1,0 +1,139 @@
+﻿@model Web.ViewModels.ProductViewModel
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Edit</title>
+</head>
+<body>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            <h4>Edit Product</h4>
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.Id)
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Quantity, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Quantity, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Quantity, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2 ">Current Image</label>
+                <div class="col-md-10">
+                    @if (Model.ShowInList == true && Model.FileInBytes != null && Model.FileInBytes.Length > 0)
+                    {
+                        var base64 = Convert.ToBase64String(Model.FileInBytes);
+                        var imgSrc = String.Format("data:image/gif;base64,{0}", base64);
+                        <img id="image" src="@imgSrc" style="width: 265px; height: 265px; display:block" />
+                    }
+                    <img id="image_preview" src="#" alt="" style="width: 265px; height: 265px; display:none" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2 ">Load new Image</label>
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.File, new { type = "file", @onchange = "readfile(this);" })
+                    @Html.ValidationMessageFor(model => model.File, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">Show image In List</label>
+                <div class="col-md-10">
+                    <div class="checkbox">
+                        @Html.RadioButtonFor(model => model.ShowInList, "true") Yes
+                        @Html.RadioButtonFor(model => model.ShowInList, "false") No
+                        @Html.ValidationMessageFor(model => model.ShowInList, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">Tags</label>
+                <div class="col-md-10">
+                    @{
+                        for (int i = 0; i < Model.Tags.Count(); i++)
+                        {
+                            @Html.CheckBoxFor(model => model.Tags[i].Selected);
+                            var intColor = @Model.Tags[i].Color;
+                            <font color="@String.Format("#{0:X6}", (0xFFFFFF & intColor ))"> @Model.Tags[i].Name</font>
+                            @Html.HiddenFor(model => model.Tags[i].TagId);
+                        }
+                    }@Html.ValidationMessageFor(model => model.Tags, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2 ">Category</label>
+                <div class="col-md-10">
+                    @Html.DropDownList("CategoryId", new SelectList(Model.Categories, "Id", "Name"), "Select One", htmlAttributes: new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Price, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Save" class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+}
+
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+
+    <script type="text/javascript">
+        function readfile(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#image_preview').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(input.files[0]);
+                showImage('image_preview');
+                hideImage('image');
+            }
+        }
+
+        function showImage (id) {
+            document.getElementById(id).style.display = "block";
+        }
+
+        function hideImage(id) {
+            document.getElementById(id).style.display = "none";
+        }
+    </script>
+
+</body>
+</html>

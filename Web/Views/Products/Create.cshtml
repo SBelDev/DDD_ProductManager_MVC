@@ -1,0 +1,152 @@
+﻿@model Web.ViewModels.ProductViewModel
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Create</title>
+    @Styles.Render("~/Content/themes/base/css")
+</head>
+<body>
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "createForm", enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="form-horizontal">
+            <h4>Create Product</h4>
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="form-group">
+                @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Quantity, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Quantity, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Quantity, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2 "></label>
+                <div class="col-md-10">
+                    <img id="image_preview" src="#" alt="" style="width: 265px; height: 265px; display:none" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2 ">Load Image</label>
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.File, new { type = "file", @onchange = "readfile(this);" })
+                    @Html.ValidationMessageFor(model => model.File, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">Show image In List</label>
+                <div class="col-md-10">
+                    <div class="checkbox">
+                        @Html.RadioButtonFor(model => model.ShowInList, "true") Yes
+                        @Html.RadioButtonFor(model => model.ShowInList, "false") No
+                        @Html.ValidationMessageFor(model => model.ShowInList, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">Tags</label>
+                <div class="col-md-10">
+                    @{
+                        for (int i = 0; i < Model.Tags.Count(); i++)
+                        {
+                            @Html.CheckBoxFor(model => model.Tags[i].Selected);
+                            var intColor = @Model.Tags[i].Color;
+                            <font color="@String.Format("#{0:X6}", (0xFFFFFF & intColor ))"> @Model.Tags[i].Name</font>
+                            @Html.HiddenFor(model => model.Tags[i].TagId);
+                        }
+                    }@Html.ValidationMessageFor(model => model.Tags, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2 ">Category</label>
+                <div class="col-md-10">
+                    @Html.DropDownList("CategoryId", new SelectList(Model.Categories, "Id", "Name"), "Select One", htmlAttributes: new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Price, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Create" class="btn btn-default" style="display:none;" />
+                    </div>
+                </div>
+}
+
+    <div id="dialog-confirm" title="Confirmation form">
+        <div id="txtAccept" style="display:none"><p style="color : red">Accept the terms and conditions befor submit</p></div>
+    </div>
+
+    <script type="text/javascript">
+        function getConfirmaitionDialog() {
+
+            // Define the Dialog and its properties.
+            $("#dialog-confirm").dialog({
+                resizable: false,
+                modal: true,
+                create: function (e, ui) {
+                    var pane = $(this).dialog("widget").find(".ui-dialog-buttonpane")
+                    $("<label class='shut-up' ><input type='checkbox' id = 'isCheckboxSelected'/> Accept the terms and conditions</label>").prependTo(pane)
+                },
+                buttons: {
+                    "Submit": function () {
+                        if ($("#isCheckboxSelected").is(':checked')) {
+                            $("#createForm").submit();
+                        }
+                        else {
+                            $("#txtAccept").show();  // unchecked
+                        }
+                    },
+                    "Cancel": function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+        };
+
+        function readfile(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#image_preview').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(input.files[0]);
+                showImage('image_preview');
+            }
+        }
+
+        function showImage(id) {
+            document.getElementById(id).style.display = "block";
+        }
+
+    </script>
+
+    <div>
+        <input type="button" value="Create" class="btn btn-default" onclick="getConfirmaitionDialog()" />
+    </div>
+
+</body>
+</html>
